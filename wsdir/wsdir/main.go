@@ -17,5 +17,5 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(matches[len(matches)-1])
+	fmt.Println(matches[0])
 }

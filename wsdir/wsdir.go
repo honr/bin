@@ -54,8 +54,12 @@ func Get(sty string) ([]string, error) {
 			matches = append(matches, value)
 		}
 	}
-	if len(matches) == 0 {
+	n := len(matches)
+	if n == 0 {
 		return matches, fmt.Errorf("Didn't find any matches")
+	}
+	for i := (n - 1) / 2; i >= 0; i-- {
+		matches[n - i - 1], matches[i] = matches[i], matches[n - i -1]
 	}
 	return matches, nil
 }

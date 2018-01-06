@@ -17,5 +17,5 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(os.ExpandEnv(matches[len(matches)-1]))
+	fmt.Println(os.ExpandEnv(matches[0]))
 }
