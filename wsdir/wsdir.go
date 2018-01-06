@@ -51,7 +51,7 @@ func Get(sty string) ([]string, error) {
 				continue
 			}
 			value := lineChunks[1]
-			matches = append(matches, value)
+			matches = append(matches, os.ExpandEnv(value))
 		}
 	}
 	n := len(matches)
