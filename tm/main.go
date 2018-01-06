@@ -6,16 +6,52 @@ import (
 	"fmt"
 	"log"
 	"os"
-	// "cmd"
+	"os/exec"
 )
 
 func main() {
 	if len(os.Args) < 2 {
-		log.Fatal("TODO: list existing sessions")
+		cmd := exec.Command("tmux", "list-sessions")
+		cmd.Stdout = os.Stdout
+		cmd.Run() // When empty an error is returned, which is not useful.
+		return
 	}
-	matches, err := wsdir.Get(os.Args[1])
+	sty := os.Args[1]
+
+	cmd := exec.Command("tmux", "attach-session", "-t", sty)
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err == nil {
+		return
+	}
+
+	matches, err := wsdir.Get(sty)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(os.ExpandEnv(matches[0]))
+	dir := matches[0]
+	cmd = exec.Command("tmux", "new-session", "-d", "-s", sty, "-c", dir, "env",
+		fmt.Sprint("STY=%s", sty), os.ExpandEnv("$SHELL"))
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err = cmd.Run(); err != nil {
+		log.Fatal(err)
+	}
+
+	cmd = exec.Command("tmux", "set-environment", "-t", sty, "STY", sty)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err = cmd.Run(); err != nil {
+		log.Fatal(err)
+	}
+
+	// TODO: source ~/.tmux/$STY
+	cmd = exec.Command("tmux", "attach-session", "-t", sty)
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err = cmd.Run(); err != nil {
+		log.Fatal(err)
+	}
 }
