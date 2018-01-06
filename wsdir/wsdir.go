@@ -19,6 +19,9 @@ var (
 
 // Get looks up keys in string table in file `dirsFilename`.
 func Get(sty string) ([]string, error) {
+	oldDollarSTY := os.Getenv("STY")
+	os.Setenv("STY", sty)
+	defer func() { os.Setenv("STY", oldDollarSTY) }()
 	keys := []string{sty}
 	for re, tag := range fallbackMatchers {
 		if re.MatchString(sty) {
